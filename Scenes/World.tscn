@@ -1,0 +1,97 @@
+[gd_scene load_steps=14 format=2]
+
+[ext_resource path="res://Scenes/Player.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Scripts/World.gd" type="Script" id=2]
+[ext_resource path="res://Sprites/space6_4-frames (1).png" type="Texture" id=3]
+[ext_resource path="res://Scenes/Interface.tscn" type="PackedScene" id=4]
+[ext_resource path="res://Scenes/LRock.tscn" type="PackedScene" id=5]
+[ext_resource path="res://Sprites/space6_4-frames (2).png" type="Texture" id=6]
+[ext_resource path="res://Sprites/space6_4-frames (3).png" type="Texture" id=7]
+[ext_resource path="res://Sprites/space6_4-frames (4).png" type="Texture" id=8]
+[ext_resource path="res://Scripts/Background.gd" type="Script" id=9]
+
+[sub_resource type="Shader" id=1]
+code = "shader_type canvas_item;
+uniform float scroll_speed;
+
+void fragment() {
+	vec2 shifteduv = UV;
+	shifteduv.y -= TIME * scroll_speed;
+	vec4 col = texture(TEXTURE, shifteduv);
+	COLOR = col;
+}
+"
+
+[sub_resource type="ShaderMaterial" id=2]
+shader = SubResource( 1 )
+shader_param/scroll_speed = null
+
+[sub_resource type="AnimatedTexture" id=3]
+flags = 4
+frames = 4
+fps = 3.0
+frame_0/texture = ExtResource( 3 )
+frame_1/texture = ExtResource( 6 )
+frame_1/delay_sec = 0.0
+frame_2/texture = ExtResource( 7 )
+frame_2/delay_sec = 0.0
+frame_3/texture = ExtResource( 8 )
+frame_3/delay_sec = 0.0
+
+[sub_resource type="Curve2D" id=4]
+_data = {
+"points": PoolVector2Array( 0, 0, 0, 0, 3.46417, 1.46169, 0, 0, 0, 0, 1026.22, 3.24348, 0, 0, 0, 0, 1028, 601.927, 0, 0, 0, 0, 4.46033, 602.356, 0, 0, 0, 0, 3.46417, 1.46169 )
+}
+
+[node name="World" type="Node"]
+script = ExtResource( 2 )
+LRock = ExtResource( 5 )
+
+[node name="Background" type="TextureRect" parent="."]
+material = SubResource( 2 )
+margin_right = 1033.0
+margin_bottom = 606.0
+texture = SubResource( 3 )
+stretch_mode = 2
+script = ExtResource( 9 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+scroll_speed = 1.0
+
+[node name="Player" parent="." instance=ExtResource( 1 )]
+position = Vector2( 510.98, 301.721 )
+
+[node name="RockTimer" type="Timer" parent="."]
+wait_time = 0.5
+
+[node name="LRockTimer" type="Timer" parent="."]
+wait_time = 1.5
+
+[node name="ScoreTimer" type="Timer" parent="."]
+
+[node name="StartTimer" type="Timer" parent="."]
+wait_time = 2.0
+one_shot = true
+
+[node name="LevelUpTimer" type="Timer" parent="."]
+wait_time = 10.0
+
+[node name="StartPos" type="Position2D" parent="."]
+position = Vector2( 512, 300 )
+
+[node name="EnemyPath" type="Path2D" parent="."]
+curve = SubResource( 4 )
+
+[node name="RockPath" type="PathFollow2D" parent="EnemyPath"]
+position = Vector2( 3.46417, 1.46169 )
+rotation = 0.00174215
+
+[node name="Interface" parent="." instance=ExtResource( 4 )]
+[connection signal="hit" from="Player" to="." method="_on_Player_hit"]
+[connection signal="timeout" from="RockTimer" to="." method="_on_RockTimer_timeout"]
+[connection signal="timeout" from="LRockTimer" to="." method="_on_LRockTimer_timeout"]
+[connection signal="timeout" from="ScoreTimer" to="." method="_on_ScoreTimer_timeout"]
+[connection signal="timeout" from="StartTimer" to="." method="_on_StartTimer_timeout"]
+[connection signal="timeout" from="LevelUpTimer" to="." method="_on_LevelUpTimer_timeout"]
+[connection signal="startGame" from="Interface" to="." method="newGame"]

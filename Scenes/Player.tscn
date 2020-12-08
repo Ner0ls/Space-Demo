@@ -1,0 +1,31 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://Sprites/player1.png" type="Texture" id=1]
+[ext_resource path="res://Sprites/player.png" type="Texture" id=2]
+[ext_resource path="res://Scripts/Player.gd" type="Script" id=3]
+
+[sub_resource type="SpriteFrames" id=1]
+animations = [ {
+"frames": [ ExtResource( 1 ), ExtResource( 2 ) ],
+"loop": true,
+"name": "top",
+"speed": 10.0
+} ]
+
+[node name="Player" type="Area2D"]
+position = Vector2( 528.818, 301.721 )
+collision_mask = 2
+script = ExtResource( 3 )
+speed = 500
+acceleration = 0.1
+friction = 0.15
+
+[node name="AnimatedSprite" type="AnimatedSprite" parent="."]
+frames = SubResource( 1 )
+animation = "top"
+playing = true
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+build_mode = 1
+polygon = PoolVector2Array( 0, -28, -10, 7, -21, 25, 21, 25, 10, 7 )
+[connection signal="body_entered" from="." to="." method="_on_Player_body_entered"]
